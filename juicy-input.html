@@ -13,15 +13,16 @@
             position: relative;
         }
         
-        #juicy-input-label {
+       #juicy-input-label {
             position: absolute;
             top: -1em;
             right: 0px;
             left: 0px;
             //font-size: 0.9em;
-            transform: scale(0.75, 0.75);
+            font-weight: bold;
+            transform: scale(0.95, 0.95);
             transform-origin: 0% 0%;
-            //color: #646464;
+            color: #337ab7;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -290,7 +291,7 @@
 
             },
             _change: function () {
-                     this.textContent = "-" + this.value;
+                     this.textContent = "- " + this.value;
                 }
         });
     })();
