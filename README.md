@@ -4,7 +4,7 @@
 
 ## Demo
 
-[Check it live!](http://juicy.github.io/juicy-input)
+[Check it live!](http://juicy.github.io/juicy-input) (Soon!)
 
 ## Usage
 
@@ -24,9 +24,9 @@
 
     ```html
 	 <h4>Examples</h4>
-     <juicy-input type="text" value="Hello you" label="The label" title="The title" editable></juice-input>
-	 <juicy-input type="number" value="123" label="The label again" title="The Title again" editable></juice-input>
-	 <juicy-input type="date" value="" mode="input" label="yet another label" editable></juice-input>
+     <juicy-input type="text" value="Hello you" label="The label" title="The title" editable></juicy-input>
+	 <juicy-input type="number" value="123" label="The label again" title="The Title again" editable></juicy-input>
+	 <juicy-input type="date" value="" mode="input" label="yet another label" editable></juicy-input>
     ```
 
 ## Attributes
