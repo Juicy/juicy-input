@@ -1,0 +1,16 @@
+{
+  "name": "juicy-input",
+  "version": "1.0.0",
+  "description": "Custom Element that highlights input fields with an animation",
+  "main": "juicy-input.html",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Juicy/juicy-input"
+  },
+  "bugs": {
+    "url": "https://github.com/Juicy/juicy-input/issues"
+  },
+  "license": "MIT"
+ 
+}

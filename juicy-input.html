@@ -1,0 +1,299 @@
+<!-- juicy-input version: 1.0.0 | MIT License -->
+<link rel="import" href="/sys/iron-a11y-keys/iron-a11y-keys.html">
+<dom-module id="juicy-input">
+    <style>
+        :host {
+            display: inline-block;
+            width: 100%;
+            --juicy-input-margin: 0.7em 0 5px 0;
+            margin: var(--juicy-input-margin);
+        }
+        
+        #juicy-input-container {
+            position: relative;
+        }
+        
+        #juicy-input-label {
+            position: absolute;
+            top: -1em;
+            right: 0px;
+            left: 0px;
+            //font-size: 0.9em;
+            transform: scale(0.75, 0.75);
+            transform-origin: 0% 0%;
+            //color: #646464;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+            transition: all .15s;
+        }
+        
+        #juicy-input-text {
+            background: none;
+            border: 0;
+            width: 100%;
+        }
+        
+        textarea#juicy-input-text {
+            padding: 1px 0;
+            resize: none;
+            margin-bottom: -5px;
+        }
+        
+        #juicy-input-text:focus {
+            outline: none;
+        }
+        
+        #juicy-input-text::-webkit-input-placeholder {
+            opacity: 0;
+            font-size: 1px;
+        }
+        
+        #juicy-input-text::-moz-placeholder {
+            opacity: 0;
+            font-size: 1px;
+        }
+        
+        #juicy-input-text:-ms-input-placeholder {
+            opacity: 0;
+            font-size: 1px;
+        }
+        
+        #juicy-input-text:-moz-placeholder {
+            opacity: 0;
+            font-size: 1px;
+        }
+        
+        #juicy-input-text:focus ~ #juicy-input-divider {
+            border-top: 1px solid #337ab7;
+        }
+        
+        #juicy-input-text:focus ~ #juicy-input-divider-selected {
+            border-top: 1px solid #337ab7;
+            transform: scale(1, 1);
+            transition: all .3s;
+        }
+        
+        #juicy-input-text:placeholder-shown + #juicy-input-label {
+            //transform: scale(1, 1);
+            //top: 15%;
+        }
+        
+        #juicy-input-text:readonly + #juicy-input-label {
+            //transform: scale(1, 1);
+            //top: 15%;
+        }
+        
+        #juicy-input-divider,
+        #juicy-input-divider-selected {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            border: 0;
+            border-top: 1px solid gray;
+            transition: all 0s;
+        }
+        
+        #juicy-input-divider-selected {
+            transform: scale(0, 1);
+        }
+        
+        .btn-group {
+            position: absolute;
+            right: 0px;
+        }
+        
+        .btn {
+            font-size: 10px;
+            padding: 5px 7px;
+            z-index: 1010;
+        }
+    </style>
+    <template>
+        <div id="juicy-input-container">
+            <template is="dom-if" if="{{multiline}}" restamp>
+                <textarea id="juicy-input-text" value="{{value::input}}" on-focus="_focus" on-input="_input" on-blur="_blur" style$="text-align:{{textalign}}" autocomplete="off" autofocus="{{autofocus}}" on-keyup="textAreaAdjust" rows="1" ondragstart="return false;" ondrop="return false;"></textarea>
+                <!--<div id="juicy-input-text" on-focus="_focus" on-input="_input" on-blur="_blur" disabled="{{readonly}}"  style$="text-align:{{textalign}}" autocomplete="off" autofocus="{{autofocus}}" contenteditable>{{value}}</div>-->
+            </template>
+            <template is="dom-if" if="{{!multiline}}" restamp>
+                <input id="juicy-input-text" type$="{{type}}" value="{{value}}" on-focus="_focus" on-input="_input" on-blur="_blur" placeholder="text" size="{{size}}" style$="text-align:{{textalign}}" autocomplete="off" autofocus="{{autofocus}}"  ondragstart="return false;" ondrop="return false;"/>
+            </template>
+            <template is="dom-if" if="{{showButtons}}">
+                <div class="btn-group pull-right" role="group">
+                    <button tabindex="-1" id="cancel-btn" class="btn btn-danger" on-tap="_cancel">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <button tabindex="-1" class="btn btn-success" on-tap="_ok">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                </div>
+            </template>
+			<!-- <span id="juicy-input-label"><juicy-label value="{{label}}"></juicy-label></span> -->
+            <span id="juicy-input-label"><juicy-label value="{{label}}"></juicy-label></span>
+            <hr id="juicy-input-divider" />
+            <hr id="juicy-input-divider-selected" />
+        </div>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="{{mode}}" on-keys-pressed="_onKey"></iron-a11y-keys>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="esc" on-keys-pressed="_onEsc"></iron-a11y-keys>
+    </template>
+</dom-module>
+
+<script>
+    (function () {
+
+        Polymer({
+            is: 'juicy-input',
+            properties: {
+                value: {
+                    type: String,
+                    notify: true
+                },
+                label: {
+                    type: String,
+                },
+                editable: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_editable'
+                },
+                type: {
+                    type: String,
+                    value: 'text'
+                },
+                mode: {
+                    type: String,
+                    value: 'approve'
+                },
+                showButtons: {
+                    type: Boolean,
+                    value: false
+                },
+                oldValue: {
+                    type: String
+                },
+                isreadonly: {
+                    type: Boolean,
+                    observer: 'readonlyChanged'
+                },
+                multiline: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            ready: function () {
+                if (this.label === null || this.label === '' || this.label === undefined) {
+                    this.customStyle['--juicy-input-margin'] = '0.1em 0 3px 0';
+                    this.updateStyles();
+                }
+            },
+            attached: function () {
+                this.debounce('attached', function () {
+                    if (this.value === undefined) {
+                        this.$$('#juicy-input-text').style.background = 'pink';
+                        this.$$('#juicy-input-text').value = 'Wrong value binding: ' + this.label;
+                    }
+                });
+            },
+            _input: function () {
+                if (this.mode === 'input') {
+                    this.set('value', this.$$('#juicy-input-text').value);
+                }
+            },
+            _blur: function (e) {
+                if (this.mode === 'blur') {
+                    this.set('value', this.$$('#juicy-input-text').value);
+                }
+                if (this.mode === 'approve') {
+                    if (e.relatedTarget !== this.$$('#cancel-btn')) {
+                        this.set('value', this.$$('#juicy-input-text').value);
+                        this.showButtons = false;
+                    } else {
+                        this._cancel();
+                    }
+                }
+            },
+            _focus: function () {
+                this.oldValue = this.$$('#juicy-input-text').value;
+                if (this.mode === 'approve') {
+                    this.showButtons = true;
+                }
+            },
+            _onKey: function () {
+                this.set('value', this.$$('#juicy-input-text').value);
+            },
+            _onEsc: function () {
+                this.$$('#juicy-input-text').value = this.oldValue;
+                this.$$('#juicy-input-text').select();
+            },
+            _cancel: function () {
+                if (this.mode === 'approve') {
+                    this.$$('#juicy-input-text').blur();
+                    this.$$('#juicy-input-text').value = this.oldValue;
+                    this.showButtons = false;
+                }
+            },
+            _ok: function () {
+                this.set('value', this.$$('#juicy-input-text').value);
+                this.showButtons = false;
+            },
+            textAreaAdjust: function () {
+                var o = this.$$('#juicy-input-text');
+                o.style.height = "1px";
+                o.style.height = (o.scrollHeight) + "px";
+            },
+            _editable: function () {
+                this.debounce('_editable', function () {
+                    if (this.editable) {
+                        this.$$('#juicy-input-text').readOnly = false;
+                    } else {
+                        this.$$('#juicy-input-text').readOnly = true;
+                        this.mode = "input";
+                    }
+                });
+            },
+            readonlyChanged: function () {
+                if (this.isreadonly === false) {
+                    this.editable = true;
+                } else {
+                    this.editable = false;
+                }
+            },
+        });
+
+    })();
+</script>
+
+<dom-module id="juicy-label">
+    <style>
+        :host {
+            display: inline;
+        }
+    </style>
+    <template>
+    </template>
+</dom-module>
+<script>
+    (function () {
+
+        Polymer({
+            is: 'juicy-label',
+            properties: {
+                value: {
+                    type: String,
+                    observer: '_change'
+                }
+            },
+            ready: function () {
+
+            },
+            _change: function () {
+                     this.textContent = "-" + this.value;
+                }
+            }
+
+        });
+    })();
+</script>
