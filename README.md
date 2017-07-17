@@ -1,3 +1,5 @@
+:warning: This element is **DEPRECATED**
+
 # &lt;juicy-input&gt;
 
 `<juicy-input>` Custom Element that highlights input fields with an animation
